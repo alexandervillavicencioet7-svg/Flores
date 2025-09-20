@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Flores Amarillas</title>
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(ellipse at center, #0b0720 0%, #06040a 100%);
+      overflow-x: hidden;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      min-height: 100vh;
+    }
+
+    /* Fondo estelar */
+    .stars {
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background: transparent;
+    }
+    .stars span {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite alternate;
+    }
+    @keyframes twinkle {
+      from { opacity: 0.2; }
+      to { opacity: 1; }
+    }
+
+    /* Caja de contraseña con estilo neón */
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    #passwordBox {
+      background: rgba(0,0,0,0.7);
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 0 25px #00f0ff, 0 0 50px #00f0ff inset;
+      text-align: center;
+      color: #00f0ff;
+      font-family: 'Courier New', monospace;
+    }
+    #dots span {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      margin: 5px;
+      border-radius: 50%;
+      background: #444;
+    }
+    #keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    #keypad button {
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #111;
+      color: #00f0ff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      box-shadow: 0 0 8px #00f0ff;
+      transition: transform 0.2s;
+    }
+    #keypad button:hover {
+      transform: scale(1.1);
+    }
+
+    /* Contenido principal oculto hasta desbloquear */
+    .container.hidden { display: none; }
+
+    .flowers {
+      margin-top: 40px;
+    }
+    .flowers img {
+      width: 280px;
+      max-width: 90%;
+      opacity: 0;
+      animation: fadeIn 2s ease forwards, sway 5s ease-in-out infinite, glow 3s ease-in-out infinite alternate;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    @keyframes sway {
+      0% { transform: rotate(0deg); }
+      50% { transform: rotate(2deg); }
+      100% { transform: rotate(0deg); }
+    }
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 5px #ffd94d); }
+      to { filter: drop-shadow(0 0 20px #ffc107); }
+    }
+
+    /* Texto final */
+    .messageBox {
+      margin: 40px auto;
+      max-width: 800px;
+      font-size: 1.4rem;
+      line-height: 1.8;
+      color: #fff;
+      text-shadow: 0 0 5px #00f0ff, 0 0 10px #00f0ff, 0 0 20px #00f0ff;
+    }
+
+    /* Animación de pétalos */
+    .petal {
+      position: fixed;
+      top: -100px;
+      width: 40px;
+      height: 40px;
+      pointer-events: none;
+      animation: fall linear forwards;
+    }
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Animación de meteoritos */
+    .meteor {
+      position: fixed;
+      top: -100px;
+      width: 50px;
+      height: 50px;
+      pointer-events: none;
+      animation: fallMeteor linear forwards;
+    }
+    @keyframes fallMeteor {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(120vh) rotate(180deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Contraseña -->
+  <div id="overlay">
+    <div id="passwordBox">
+      <h2>Ingresa la contraseña</h2>
+      <p>Mi Val, la contraseña es nuestra fecha</p>
+      <div id="dots"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <div id="keypad"></div>
+      <p id="errorMsg" style="color:#ff8080;"></p>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="container hidden">
+    <div class="stars" id="stars"></div>
+
+    <h1>💙 Feliz 21 de Septiembre 💙</h1>
+    <div class="flowers">
+      <!-- 🌼 Aquí va la imagen PNG del ramo -->
+      <img src="img/1758402324784.png" alt="Ramo de flores amarillas">
+    </div>
+
+    <div class="messageBox" id="finalMessage">
+    Te amo demasiado 💙  
+    Las palabras no alcanzan para expresar lo que siento por ti.  
+    Este ramo y este cielo estrellado son para recordarte  
+    lo especial que eres en mi vida, y que sepas que siempre mi
+    corazon va a estar ligado a ti como una de tus propiedades.
+    No es un regalo muy detallista, pero mi intención, siempre
+    va a ser estar a tu lado fuera de los regalos o detalles
+    el mayor regalo de la vida es estar vinculado a ti en una
+    fecha tan especial, Te Amo Mi Morenita✨
+    </div>
+  </div>
+
+  <script>
+    let input = "";
+    const correctPassword = "170324";
+
+    const keypad = document.getElementById("keypad");
+    [1,2,3,4,5,6,7,8,9,"⌫",0,"✔"].forEach(k=>{
+      const b=document.createElement("button");
+      b.textContent=k;
+      b.onclick=()=>{if(k==="⌫")clearInput(); else if(k==="✔")submitPassword(); else pressKey(k)};
+      keypad.appendChild(b);
+    });
+
+    function pressKey(n){if(input.length<6){input+=n;updateDots();}}
+    function clearInput(){input=input.slice(0,-1);updateDots();}
+    function submitPassword(){
+      if(input===correctPassword){
+        document.getElementById("overlay").style.display="none";
+        document.querySelector(".container").classList.remove("hidden");
+        startAnimations();
+      } else {
+        document.getElementById("errorMsg").textContent="Contraseña incorrecta.";
+        input="";updateDots();
+      }
+    }
+    function updateDots(){
+      document.querySelectorAll("#dots span").forEach((s,i)=>{
+        s.style.background=i<input.length?"#00f0ff":"#444";
+      });
+    }
+
+    function startAnimations(){
+      // estrellas
+      const starContainer=document.getElementById("stars");
+      for(let i=0;i<100;i++){
+        const s=document.createElement("span");
+        s.style.left=Math.random()*100+"%";
+        s.style.top=Math.random()*100+"%";
+        s.style.animationDuration=(1+Math.random()*2)+"s";
+        starContainer.appendChild(s);
+      }
+
+      // pétalos
+      setInterval(()=>{
+        const p=document.createElement("img");
+        p.src="img/1758402183320.png"; // 🌸 tu PNG de pétalo
+        p.className="petal";
+        p.style.left=Math.random()*100+"%";
+        p.style.animationDuration=(5+Math.random()*5)+"s";
+        document.body.appendChild(p);
+        setTimeout(()=>p.remove(),10000);
+      },600);
+
+      // meteoritos
+      setInterval(()=>{
+        const m=document.createElement("img");
+        m.src="img/si.png"; // ☄️ tu PNG de meteorito
+        m.className="meteor";
+        m.style.left=Math.random()*100+"%";
+        m.style.animationDuration=(3+Math.random()*4)+"s";
+        document.body.appendChild(m);
+        setTimeout(()=>m.remove(),8000);
+      },900);
+    }
+  </script>
+</body>
+</html>
